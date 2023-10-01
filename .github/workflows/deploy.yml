@@ -1,6 +1,8 @@
 name: DockerHub CI
 
-on: release
+on:
+  release:
+    types: [published]
 
 jobs:
   build:
