@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,23 +18,41 @@ import (
 var serverManager ServerManager = ServerManager{}
 
 func main() {
-	// Get IP from env
-	ip := os.Getenv("IP_ADDRESS")
-	if ip == "" {
-		ip = "0.0.0.0"
+	// Get settings from settings.json
+	settingsFile, err := os.ReadFile("./settings.json")
+	if err != nil {
+		fmt.Println("Error reading settings.json")
 	}
+	var settings Settings
+	_ = json.Unmarshal(settingsFile, &settings)
 
-	// Get port from env
-	port := os.Getenv("REST_PORT")
-	if port == "" {
-		port = "8080"
+	// Override settings from env
+	ENV_IP_ADDRESS := os.Getenv("IP_ADDRESS")
+	if ENV_IP_ADDRESS != "" {
+		settings.IP_ADDRESS = ENV_IP_ADDRESS
+	}
+	ENV_PORT := os.Getenv("PORT")
+	if ENV_PORT != "" {
+		settings.PORT = ENV_PORT
+	}
+	ENV_AMP_API_URL := os.Getenv("AMP_API_URL")
+	if ENV_AMP_API_URL != "" {
+		settings.AMP_API_URL = ENV_AMP_API_URL
+	}
+	ENV_AMP_API_USERNAME := os.Getenv("AMP_API_USERNAME")
+	if ENV_AMP_API_USERNAME != "" {
+		settings.AMP_API_USERNAME = ENV_AMP_API_USERNAME
+	}
+	ENV_AMP_API_PASSWORD := os.Getenv("AMP_API_PASSWORD")
+	if ENV_AMP_API_PASSWORD != "" {
+		settings.AMP_API_PASSWORD = ENV_AMP_API_PASSWORD
 	}
 
 	serverManager = ServerManager{
 		controller: *modules.NewADS(
-			os.Getenv("AMP_API_URL"),
-			os.Getenv("AMP_API_USERNAME"),
-			os.Getenv("AMP_API_PASSWORD"),
+			settings.AMP_API_URL,
+			settings.AMP_API_USERNAME,
+			settings.AMP_API_PASSWORD,
 		),
 		targetData:   make(map[string]Data[ampapi.IADSInstance, modules.ADS]),
 		instanceData: make(map[string]Data[ampapi.Instance, interface{}]),
@@ -41,7 +60,28 @@ func main() {
 	serverManager.InitInstnaceData()
 	fmt.Println("Initialized instance data")
 
-	// Initialize/Update the server manager
+	gin.SetMode(gin.ReleaseMode)
+	var router *gin.Engine = gin.Default()
+
+	// Static files
+	router.StaticFile("/openapi.json", "./openapi.json")
+
+	// Docs
+	router.GET("/docs", getRoot)
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/docs")
+	})
+
+	// API routes
+	router.GET("/target/status/:targetName", getTargetStatus)
+	router.GET("/instance/status/simple/:instanceName", getInstanceStatusSimple)
+	router.GET("/server/status/:serverName", getServerStatus)
+	router.GET("/server/status/simple/:serverName", getServerStatusSimple)
+
+	router.Run(settings.IP_ADDRESS + ":" + settings.PORT)
+	fmt.Println("Started server on " + settings.IP_ADDRESS + ":" + settings.PORT)
+
+	// Update the server manager
 	go func() {
 		for {
 			time.Sleep(5 * time.Minute)
@@ -49,21 +89,18 @@ func main() {
 			fmt.Println("Updated instance data")
 		}
 	}()
-
-	gin.SetMode(gin.ReleaseMode)
-	var router *gin.Engine = gin.Default()
-
-	// API routes
-	router.GET("/", getRoot)
-	router.GET("/target/status/:targetName", getTargetStatus)
-	router.GET("/instance/status/simple/:instanceName", getInstanceStatusSimple)
-	router.GET("/server/status/:serverName", getServerStatus)
-	router.GET("/server/status/simple/:serverName", getServerStatusSimple)
-
-	router.Run(ip + ":" + port)
 }
 
 // -------------- Structs --------------
+
+// Settings - Settings struct
+type Settings struct {
+	IP_ADDRESS       string `json:"IP_ADDRESS"`
+	PORT             string `json:"PORT"`
+	AMP_API_URL      string `json:"AMP_API_URL"`
+	AMP_API_USERNAME string `json:"AMP_API_USERNAME"`
+	AMP_API_PASSWORD string `json:"AMP_API_PASSWORD"`
+}
 
 // Data - Generic data struct
 type Data[T any, R any] struct {
@@ -71,14 +108,14 @@ type Data[T any, R any] struct {
 	API  R
 }
 
-// -------------- Methods --------------
-
 // Instance handler
 type ServerManager struct {
 	controller   modules.ADS
 	targetData   map[string]Data[ampapi.IADSInstance, modules.ADS]
 	instanceData map[string]Data[ampapi.Instance, interface{}]
 }
+
+// -------------- Methods --------------
 
 // InitInstnaceData - Initialize the instance data
 func (s *ServerManager) InitInstnaceData() {
@@ -280,7 +317,7 @@ func serverStatusSimple(serverName string) string {
 // Get root route
 func getRoot(c *gin.Context) {
 	// Read the html file
-	html, err := os.ReadFile("index.html")
+	html, err := os.ReadFile("./index.html")
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return

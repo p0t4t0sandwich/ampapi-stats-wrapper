@@ -1,0 +1,16 @@
+---
+version: "3.8"
+services:
+  ampapi-stats-wrapper:
+    image: p0t4t0sandwich/ampapi-stats-wrapper:latest
+    container_name: ampapi-stats-wrapper
+    environment:
+      - TZ=UTC
+      - IP_ADDRESS=0.0.0.0
+      - PORT=3021
+      - AMP_API_URL=http://localhost:8080
+      - AMP_API_USERNAME=admin
+      - AMP_API_PASSWORD=myfancypassword123
+    ports:
+      - "0.0.0.0:3021:3021"
+    restart: unless-stopped
