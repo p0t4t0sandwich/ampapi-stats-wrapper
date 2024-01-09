@@ -48,12 +48,13 @@ func main() {
 		settings.AMP_API_PASSWORD = ENV_AMP_API_PASSWORD
 	}
 
+	controller, _ := modules.NewADS(
+		settings.AMP_API_URL,
+		settings.AMP_API_USERNAME,
+		settings.AMP_API_PASSWORD,
+	)
 	serverManager = ServerManager{
-		controller: *modules.NewADS(
-			settings.AMP_API_URL,
-			settings.AMP_API_USERNAME,
-			settings.AMP_API_PASSWORD,
-		),
+		controller:   *controller,
 		targetData:   make(map[string]Data[ampapi.IADSInstance, modules.ADS]),
 		instanceData: make(map[string]Data[ampapi.Instance, interface{}]),
 	}
@@ -120,7 +121,8 @@ type ServerManager struct {
 // InitInstnaceData - Initialize the instance data
 func (s *ServerManager) InitInstnaceData() {
 	// Get all instances
-	var targets []ampapi.IADSInstance = s.controller.ADSModule.GetInstances().Result
+	var targets []ampapi.IADSInstance = nil
+	targets, _ = s.controller.ADSModule.GetInstances()
 
 	for i := 0; i <= len(targets)-1; i++ {
 		var instances []ampapi.Instance = targets[i].AvailableInstances
@@ -194,9 +196,11 @@ func (s *ServerManager) InitTargetAPI(targetName string) {
 	var targetData Data[ampapi.IADSInstance, modules.ADS] = s.targetData[targetName]
 
 	// Initialize the target's API
-	var api interface{} = s.controller.InstanceLogin(targetData.Data.InstanceId, "ADS")
-	if api == nil {
-		return
+	var api interface{}
+	api, err := s.controller.InstanceLogin(targetData.Data.InstanceId, "ADS")
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("Error logging in to target " + targetName)
 	}
 	targetData.API = *api.(*modules.ADS)
 
@@ -210,7 +214,7 @@ func (s *ServerManager) InitInstanceAPI(instanceName string) {
 	var instanceData Data[ampapi.Instance, interface{}] = s.instanceData[instanceName]
 
 	// Initialize the instance's API
-	instanceData.API = s.controller.InstanceLogin(instanceData.Data.InstanceID, instanceData.Data.Module)
+	instanceData.API, _ = s.controller.InstanceLogin(instanceData.Data.InstanceID, instanceData.Data.Module)
 
 	// Store the instance data
 	s.instanceData[instanceName] = instanceData
@@ -263,7 +267,7 @@ func (s *ServerManager) GetInstanceData(instanceName string) ampapi.Instance {
 // -------------- Functions --------------
 
 // targetStatus - Get a target's status
-func targetStatus(targetName string) ampapi.Status {
+func targetStatus(targetName string) (ampapi.Status, error) {
 	return serverManager.GetTargetAPI(targetName).Core.GetStatus()
 }
 
@@ -274,7 +278,7 @@ func instanceStatusSimple(instanceName string) string {
 			if instance.FriendlyName == instanceName {
 				instaceId := instance.InstanceID
 				API := serverManager.GetTargetAPI(targetName)
-				instanceStatuses := API.ADSModule.GetInstanceStatuses().Result
+				instanceStatuses, _ := API.ADSModule.GetInstanceStatuses()
 				for i := 0; i <= len(instanceStatuses)-1; i++ {
 					if instanceStatuses[i].InstanceID == instaceId {
 						running := instanceStatuses[i].Running
@@ -293,7 +297,7 @@ func instanceStatusSimple(instanceName string) string {
 }
 
 // serverStatus - Get a server's status
-func serverStatus(serverName string) ampapi.Status {
+func serverStatus(serverName string) (ampapi.Status, error) {
 	var instanceData ampapi.Instance = serverManager.GetInstanceData(serverName)
 	switch instanceData.Module {
 	case "ADS":
@@ -308,8 +312,9 @@ func serverStatus(serverName string) ampapi.Status {
 }
 
 // serverStatusSimple - Get the simple status of a server
-func serverStatusSimple(serverName string) string {
-	return serverStatus(serverName).State.String()
+func serverStatusSimple(serverName string) (string, error) {
+	status, err := serverStatus(serverName)
+	return status.State.String(), err
 }
 
 // -------------- Handlers --------------
@@ -339,7 +344,12 @@ func getTargetStatus(c *gin.Context) {
 	}
 
 	// Return the status
-	c.JSON(http.StatusOK, targetStatus(targetName))
+	status, err := targetStatus(targetName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, status)
 }
 
 // Get instance status simple
@@ -369,7 +379,12 @@ func getServerStatus(c *gin.Context) {
 	}
 
 	// Return the status
-	c.JSON(http.StatusOK, serverStatus(serverName))
+	status, err := serverStatus(serverName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, status)
 }
 
 // Get server status simple
@@ -384,5 +399,10 @@ func getServerStatusSimple(c *gin.Context) {
 	}
 
 	// Return the status
-	c.String(http.StatusOK, serverStatusSimple(serverName))
+	status, err := serverStatusSimple(serverName)
+	if err != nil {
+		c.String(http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.String(http.StatusOK, status)
 }

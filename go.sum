@@ -60,6 +60,12 @@ github.com/p0t4t0sandwich/ampapi-go v1.0.6 h1:6PqRGSJnS/N4iqlSax+oMWUpNoQhf5e9Wh
 github.com/p0t4t0sandwich/ampapi-go v1.0.6/go.mod h1:DzXOvjTl+JtPyzPW0S9Q1q/qjjZ2kxKLUQB1dZhcWIc=
 github.com/p0t4t0sandwich/ampapi-go v1.0.7 h1:2KxoBQWI38Npnif8NHeTe3vzY2g+RdeJyfklLnfKUQk=
 github.com/p0t4t0sandwich/ampapi-go v1.0.7/go.mod h1:DzXOvjTl+JtPyzPW0S9Q1q/qjjZ2kxKLUQB1dZhcWIc=
+github.com/p0t4t0sandwich/ampapi-go v1.0.11 h1:K04xYczJfXEqK6NnbepWxEfcl6NMt19RhBw8kNIvc64=
+github.com/p0t4t0sandwich/ampapi-go v1.0.11/go.mod h1:DzXOvjTl+JtPyzPW0S9Q1q/qjjZ2kxKLUQB1dZhcWIc=
+github.com/p0t4t0sandwich/ampapi-go v1.0.12 h1:c33DP/JhjD4vG6L19R6YF8F+JqXw3S8ogxHyTihYP2U=
+github.com/p0t4t0sandwich/ampapi-go v1.0.12/go.mod h1:DzXOvjTl+JtPyzPW0S9Q1q/qjjZ2kxKLUQB1dZhcWIc=
+github.com/p0t4t0sandwich/ampapi-go v1.0.13 h1:60hhyjqwPv/C36DczIRjsBTxwc/OODgNyfJKnewg0uA=
+github.com/p0t4t0sandwich/ampapi-go v1.0.13/go.mod h1:DzXOvjTl+JtPyzPW0S9Q1q/qjjZ2kxKLUQB1dZhcWIc=
 github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
 github.com/pelletier/go-toml/v2 v2.1.0/go.mod h1:tJU2Z3ZkXwnxa4DPO899bsyIoywizdUvyaeZurnPPDc=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
