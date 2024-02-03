@@ -41,7 +41,7 @@ docker run -d \
     -e AMP_API_USERNAME=admin \
     -e AMP_API_PASSWORD=myfancypassword123 \
     --name ampapi-stats-wrapper \
-    potat0sandwich/ampapi-stats-wrapper:latest
+    p0t4t0sandwich/ampapi-stats-wrapper:latest
 ```
 
 #### Docker Compose
