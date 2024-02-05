@@ -12,6 +12,28 @@
         }
     ],
     "paths": {
+        "/target/status/GetInstanceStatuses":{
+            "get":{
+                "summary":"",
+                "description": "Get the status of a target",
+                "responses": {
+                    "200": {
+                        "description": "The status of the instances",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No instances found"
+                    }
+                }
+            }
+            
+        },
         "/target/status/{friendly_target_name}": {
             "get": {
                 "summary": "Get the status of a target",

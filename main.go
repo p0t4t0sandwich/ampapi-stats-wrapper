@@ -63,6 +63,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	var router *gin.Engine = gin.Default()
+	fmt.Println("break 1")
 
 	// Static files
 	router.StaticFile("/openapi.json", "./openapi.json")
@@ -72,20 +73,19 @@ func main() {
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/docs")
 	})
-
+	fmt.Println("break 2")
 	// API routes
 	router.GET("/target/status/:targetName", getTargetStatus)
 	router.GET("/instance/status/simple/:instanceName", getInstanceStatusSimple)
 	router.GET("/server/status/:serverName", getServerStatus)
 	router.GET("/server/status/simple/:serverName", getServerStatusSimple)
-
 	router.Run(settings.IP_ADDRESS + ":" + settings.PORT)
 	fmt.Println("Started server on " + settings.IP_ADDRESS + ":" + settings.PORT)
 
 	// Update the server manager
 	go func() {
 		for {
-			time.Sleep(5 * time.Minute)
+			time.Sleep(20 * time.Second)
 			serverManager.InitInstnaceData()
 			fmt.Println("Updated instance data")
 		}
@@ -133,6 +133,7 @@ func (s *ServerManager) InitInstnaceData() {
 			s.targetData[targets[i].FriendlyName] = Data[ampapi.IADSInstance, modules.ADS]{
 				Data: targets[i],
 				API:  s.targetData[targets[i].FriendlyName].API,
+				fmt.Println[]
 			}
 		} else {
 			// Add the target data
@@ -365,7 +366,7 @@ func getInstanceStatusSimple(c *gin.Context) {
 
 	// Return the status
 	c.String(http.StatusOK, instanceStatusSimple(instanceName))
-}
+}5
 
 // Get server status
 func getServerStatus(c *gin.Context) {
