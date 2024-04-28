@@ -1,6 +1,6 @@
 {
-    "IP_ADDRESS": "0.0.0.0",
-    "PORT": "3021",
+    "ADDRESS": "0.0.0.0:3021",
+    "USE_UDS": false,
     "AMP_API_URL": "http://localhost:8080",
     "AMP_API_USERNAME": "admin",
     "AMP_API_PASSWORD": "myfancypassword123"

@@ -81,19 +81,19 @@ The wrapper can be configured using the `settings.json` file. The following opti
 
 You can read the OpenAPI documentation for the API endpoints at `http://0.0.0.0:3021/docs`
 
-### GET /target/status/{friendly_target_name}
+### GET /target/status/{TargetName}
 
 Returns the status of the target defined by the schema `APICoreGetStatus`
 
-### GET /instance/status/simple/{friendly_instance_name}
+### GET /instance/status/simple/{InstanceName}
 
 Returns the simple status response of the instance: `Running` or `Offline`
 
-### GET /server/status/{friendly_instance_name}
+### GET /server/status/{InstanceName}
 
 Returns the status of the server defined by the schema `APICoreGetStatus`
 
-### GET /server/status/simple/{friendly_instance_name}
+### GET /server/status/simple/{InstanceName}
 
 Returns the simple status response of the server defined by the schema `APIStateEnum`
 

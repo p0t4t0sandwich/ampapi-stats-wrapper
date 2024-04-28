@@ -3,7 +3,7 @@
     "info": {
         "title": "AMP API Stats Wrapper",
         "description": "A simple wrapper built on the AMP API to expose API endpoints that return status responses",
-        "version": "1.0.0"
+        "version": "1.1.0"
     },
     "servers": [
         {
@@ -12,13 +12,13 @@
         }
     ],
     "paths": {
-        "/target/status/{friendly_target_name}": {
+        "/target/status/{TargetName}": {
             "get": {
                 "summary": "Get the status of a target",
                 "description": "Get the status of a target",
                 "parameters": [
                     {
-                        "name": "friendly_target_name",
+                        "name": "TargetName",
                         "in": "path",
                         "description": "The name of the target",
                         "required": true,
@@ -44,13 +44,13 @@
                 }
             }
         },
-        "/instance/status/simple/{friendly_instance_name}": {
+        "/instance/status/simple/{InstanceName}": {
             "get": {
                 "summary": "Get the simple status of an instance",
                 "description": "Get the simple status of an instance",
                 "parameters": [
                     {
-                        "name": "friendly_instance_name",
+                        "name": "InstanceName",
                         "in": "path",
                         "description": "The name of the instance",
                         "required": true,
@@ -76,13 +76,13 @@
                 }
             }
         },
-        "/server/status/{friendly_instance_name}": {
+        "/server/status/{InstanceName}": {
             "get": {
                 "summary": "Get the status of a server",
                 "description": "Get the status of a server",
                 "parameters": [
                     {
-                        "name": "friendly_instance_name",
+                        "name": "InstanceName",
                         "in": "path",
                         "description": "The name of the instance",
                         "required": true,
@@ -108,13 +108,13 @@
                 }
             }
         },
-        "/server/status/simple/{friendly_instance_name}": {
+        "/server/status/simple/{InstanceName}": {
             "get": {
                 "summary": "Get the simple status of a server",
                 "description": "Get the simple status of a server",
                 "parameters": [
                     {
-                        "name": "friendly_instance_name",
+                        "name": "InstanceName",
                         "in": "path",
                         "description": "The name of the instance",
                         "required": true,
