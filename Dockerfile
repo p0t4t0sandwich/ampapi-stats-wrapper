@@ -13,7 +13,7 @@ FROM alpine:edge AS release-stage
 
 WORKDIR /app
 
-COPY ./public ./public
+COPY openapi.json index.html ./
 COPY --from=build /app/ampapi-stats-wrapper .
 
 CMD ["/app/ampapi-stats-wrapper"]

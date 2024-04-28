@@ -49,7 +49,7 @@ func (s *Service) InitData() {
 			Target:   nil,
 		}
 		for _, instance := range target.AvailableInstances {
-			s.Instances[instance.FriendlyName] = &InstanceData{
+			s.Instances[instance.InstanceName] = &InstanceData{
 				InstanceID: instance.InstanceID,
 				Instance:   nil,
 			}
@@ -84,10 +84,10 @@ func (s *Service) RefreshData() {
 			}
 		}
 		for _, instance := range target.AvailableInstances {
-			if i, ok := s.Instances[instance.FriendlyName]; ok {
-				s.Instances[instance.FriendlyName] = i
+			if i, ok := s.Instances[instance.InstanceName]; ok {
+				s.Instances[instance.InstanceName] = i
 			} else {
-				s.Instances[instance.FriendlyName] = &InstanceData{
+				s.Instances[instance.InstanceName] = &InstanceData{
 					InstanceID: instance.InstanceID,
 				}
 			}
@@ -137,6 +137,14 @@ func (s *Service) ReauthInstance(instanceName string) error {
 
 // GetTargetStatus - Get the target status
 func (s *Service) GetTargetStatus(targetName string) (*ampapi.Status, error) {
+	if targetName == "ADS01" {
+		status, err := s.Controller.Core.GetStatus()
+		if err != nil {
+			return nil, err
+		}
+		return &status, nil
+	}
+
 	target := s.Targets[targetName]
 	if target.Target == nil {
 		err := s.ReauthTarget(targetName)
@@ -169,7 +177,7 @@ func (s *Service) GetServerStatus(instanceName string) (*ampapi.Status, error) {
 	return &status, nil
 }
 
-// InstanceStatusSimple
+// InstanceStatusSimple - Get the instance status in a simple format
 func (s *Service) InstanceStatusSimple(instanceName string) (string, error) {
 	targets, err := s.Controller.ADSModule.GetInstances()
 	if err != nil {
@@ -177,7 +185,7 @@ func (s *Service) InstanceStatusSimple(instanceName string) (string, error) {
 	}
 	for _, target := range targets {
 		for _, instance := range target.AvailableInstances {
-			if instance.FriendlyName == instanceName {
+			if instance.InstanceName == instanceName {
 				instanceID := instance.InstanceID
 				instanceStatuses, _ := s.Controller.ADSModule.GetInstanceStatuses()
 				for _, instanceStatus := range instanceStatuses {
@@ -194,7 +202,7 @@ func (s *Service) InstanceStatusSimple(instanceName string) (string, error) {
 	return "", err
 }
 
-// ServerStatusSimple
+// ServerStatusSimple - Get the server status in a simple format
 func (s *Service) ServerStatusSimple(serverName string) (string, error) {
 	instance := s.Instances[serverName]
 	if instance.Instance == nil {
