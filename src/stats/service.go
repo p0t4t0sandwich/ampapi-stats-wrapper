@@ -175,13 +175,12 @@ func (s *Service) GetServerStatus(instanceName string) (*ampapi.Status, error) {
 	}
 
 	status, err := instance.Instance.Core.GetStatus()
-	if status.State == 0 && status.Uptime == "" && status.Metrics == nil {
-		return nil, errors.New("instance is not running")
-	}
 	if err != nil {
 		s.Instances[instanceName].Instance = nil
 		s.ReauthInstance(instanceName)
 		return nil, err
+	} else if status.State == 0 && status.Uptime == "" && status.Metrics == nil {
+		return nil, errors.New("instance is not running")
 	}
 	return &status, nil
 }
@@ -222,13 +221,12 @@ func (s *Service) ServerStatusSimple(serverName string) (string, error) {
 	}
 
 	status, err := instance.Instance.Core.GetStatus()
-	if status.State == 0 && status.Uptime == "" && status.Metrics == nil {
-		return "InstanceOffline", nil
-	}
 	if err != nil {
 		s.Instances[serverName].Instance = nil
 		s.ReauthInstance(serverName)
 		return "", err
+	} else if status.State == 0 && status.Uptime == "" && status.Metrics == nil {
+		return "InstanceOffline", nil
 	}
 	return status.State.String(), nil
 }
