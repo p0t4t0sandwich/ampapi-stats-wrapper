@@ -65,14 +65,19 @@ services:
     restart: unless-stopped
 ```
 
+## Permissions
+
+Within AMP, the user you use only needs the `manage` permission for each instance/target you want to monitor.
+After changing permissions you'll need to restart the container/program for the changes to take effect.
+
 ## Configuration
 
 The wrapper can be configured using the `settings.json` file. The following options are available:
 
 | Option | Description | Default |
 | --- | --- | --- |
-| `IP_ADDRESS` | The IP address to bind to | `0.0.0.0` (all interfaces) |
-| `PORT` | The port to bind to | `3021` |
+| `ADDRESS` | The IP address and port to bind to | `0.0.0.0:3021` |
+| `USE_UDS` | Whether to use a Unix Domain Socket (UDS) instead of a TCP socket | `false` |
 | `AMP_API_URL` | The URL of the AMP API | `http://localhost:8080` |
 | `AMP_API_USERNAME` | The username to use when authenticating with the AMP API | `admin` |
 | `AMP_API_PASSWORD` | The password to use when authenticating with the AMP API | `myfancypassword123` |
