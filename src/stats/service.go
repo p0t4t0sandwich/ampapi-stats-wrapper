@@ -140,6 +140,7 @@ func (s *Service) GetTargetStatus(targetName string) (*ampapi.Status, error) {
 	if targetName == "ADS01" {
 		status, err := s.Controller.Core.GetStatus()
 		if err != nil {
+			s.ReauthController()
 			return nil, err
 		}
 		return &status, nil
@@ -155,6 +156,8 @@ func (s *Service) GetTargetStatus(targetName string) (*ampapi.Status, error) {
 
 	status, err := target.Target.Core.GetStatus()
 	if err != nil {
+		s.Targets[targetName].Target = nil
+		s.ReauthTarget(targetName)
 		return nil, err
 	}
 	return &status, nil
@@ -172,6 +175,8 @@ func (s *Service) GetServerStatus(instanceName string) (*ampapi.Status, error) {
 
 	status, err := instance.Instance.Core.GetStatus()
 	if err != nil {
+		s.Instances[instanceName].Instance = nil
+		s.ReauthInstance(instanceName)
 		return nil, err
 	}
 	return &status, nil
@@ -214,6 +219,8 @@ func (s *Service) ServerStatusSimple(serverName string) (string, error) {
 
 	status, err := instance.Instance.Core.GetStatus()
 	if err != nil {
+		s.Instances[serverName].Instance = nil
+		s.ReauthInstance(serverName)
 		return "", err
 	}
 	return status.State.String(), nil
