@@ -3,6 +3,7 @@ package stats
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/p0t4t0sandwich/ampapi-go"
@@ -33,6 +34,13 @@ func NewSettings() *Settings {
 	if ENV_ADDRESS != "" {
 		settings.ADDRESS = ENV_ADDRESS
 	}
+	if settings.ADDRESS == "" {
+		if settings.USE_UDS {
+			settings.ADDRESS = "/tmp/stats.sock"
+		} else {
+			settings.ADDRESS = "0.0.0.0:3021"
+		}
+	}
 	ENV_USE_UDS := os.Getenv("USE_UDS") == "true"
 	if ENV_USE_UDS {
 		settings.USE_UDS = ENV_USE_UDS
@@ -49,6 +57,17 @@ func NewSettings() *Settings {
 	if ENV_AMP_API_PASSWORD != "" {
 		settings.AMP_API_PASSWORD = ENV_AMP_API_PASSWORD
 	}
+	log.Printf("Creating new settings object with the following properties:")
+	log.Printf("ADDRESS: %s", settings.ADDRESS)
+	log.Printf("USE_UDS: %t", settings.USE_UDS)
+	log.Printf("AMP_API_URL: %s", settings.AMP_API_URL)
+	log.Printf("AMP_API_USERNAME: %s", settings.AMP_API_USERNAME)
+	if len(settings.AMP_API_PASSWORD) > 6 {
+		log.Printf("AMP_API_PASSWORD: %s", settings.AMP_API_PASSWORD[0:3]+"***"+settings.AMP_API_PASSWORD[len(settings.AMP_API_PASSWORD)-3:])
+	} else {
+		log.Printf("AMP_API_PASSWORD: %s", settings.AMP_API_PASSWORD)
+	}
+
 	return &settings
 }
 

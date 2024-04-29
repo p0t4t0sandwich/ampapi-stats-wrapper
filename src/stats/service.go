@@ -1,7 +1,7 @@
 package stats
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/p0t4t0sandwich/ampapi-go"
@@ -55,13 +55,13 @@ func (s *Service) InitData() {
 			}
 		}
 	}
-	fmt.Println("Initialized instance data")
+	log.Println("Initialized instance data")
 
 	go func() {
 		for {
 			time.Sleep(5 * time.Minute)
 			s.RefreshData()
-			fmt.Println("Updated instance data")
+			log.Println("Updated instance data")
 		}
 	}()
 }
